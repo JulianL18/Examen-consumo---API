@@ -1,5 +1,5 @@
 // const url = 'https://api-node2.onrender.com/membresia '
-const url = 'http://localhost:8282/donaciones '
+const url = 'https://api-examen-7n3o.onrender.com/donaciones'
 
 const regresarListar = () => {
     window.location.href = 'index.html';
@@ -9,9 +9,27 @@ const recargarListaDonaciones = () => {
     listarDonaciones();
 };
 
+const cogerPrecioDolar = async () => {
+    try {
+        const response = await fetch('https://www.datos.gov.co/resource/mcec-87by.json');
+        if (!response.ok) {
+            throw new Error('Error al capturar el dólar');
+        }
+        const data = await response.json();
+        const precioDolar = parseFloat(data[0].valor);
+        document.getElementById('precio').value = precioDolar.toFixed(2);
+    } catch (error) {
+    }
+};
+
+document.addEventListener('DOMContentLoaded', cogerPrecioDolar);
+
 const listarDonaciones = async () => {
     let objectId = document.getElementById('contenido')
     let contenido = '';
+
+    await cogerPrecioDolar();
+
     fetch(url, {
         method: 'GET',
         mode: 'cors',
@@ -59,7 +77,7 @@ const registrarDonacionDinero = () => {
     const type = document.getElementById('tipo').value
     const fechaDona = document.getElementById('fechaDonado').value
     const fechaRegi = document.getElementById('fechaRegistro').value
-    const dolar = document.getElementById('precioDolar').value
+    const dolar = document.getElementById('precio').value
 
     if (idDona.length == 0) {
         document.getElementById('idDonacionHelp').innerHTML = 'Dato requerido'
@@ -118,6 +136,7 @@ const registrarDonacionDinero = () => {
                 }, 2000);
             })
 
+            cogerPrecioDolar()
     }
 
 }
@@ -305,6 +324,7 @@ const actualizarDonacionDinero = () => {
                 }, 2000);
                 //Imprimir el mensaje de la transacción
             })
+            cogerPrecioDolar();
     }
 
 }
